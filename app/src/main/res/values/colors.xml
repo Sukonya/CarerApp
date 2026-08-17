@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Primary brand colors — soft teal/sage palette -->
+    <color name="primary">#4A90A4</color>
+    <color name="primary_dark">#2C6E82</color>
+    <color name="primary_light">#E8F4F8</color>
+    <color name="accent">#F4A261</color>
+
+    <!-- Backgrounds -->
+    <color name="background">#F7FAFB</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#EEF6F9</color>
+
+    <!-- Text -->
+    <color name="text_primary">#1A2B35</color>
+    <color name="text_secondary">#6B8A99</color>
+    <color name="text_hint">#A8C0CA</color>
+
+    <!-- Input fields -->
+    <color name="input_background">#F0F7FA</color>
+    <color name="input_border">#C8DDE5</color>
+
+    <!-- Buttons -->
+    <color name="btn_family">#1A2B35</color>
+    <color name="btn_carer">#FFFFFF</color>
+    <color name="divider">#DDE8ED</color>
+</resources>
