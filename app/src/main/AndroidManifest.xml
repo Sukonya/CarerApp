@@ -17,6 +17,8 @@
         <activity
             android:name=".DashboardActivity"
             android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".CarerDetailActivity"/>
+        <activity android:name=".BookVisitActivity"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

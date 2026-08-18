@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import android.content.Intent
 
 class AuthActivity : AppCompatActivity() {
 
@@ -39,11 +40,29 @@ class AuthActivity : AppCompatActivity() {
         tvRole.text = "Role: $role"
 
         // toggle between signup and login
-        btnSignUp.setOnClickListener {
-            isSignUp = true
-            etName.visibility = android.view.View.VISIBLE
-            etPhone.visibility = android.view.View.VISIBLE
-            btnSubmit.text = "CREATE ACCOUNT"
+        btnSubmit.setOnClickListener {
+            val email = etEmail.text.toString().trim()
+            val password = etPassword.text.toString().trim()
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Email and password are required", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (isSignUp) {
+                // route to role-specific signup screen
+                val intent = if (role == "FAMILY") {
+                    Intent(this, FamilySignupActivity::class.java)
+                } else {
+                    Intent(this, CarerSignupActivity::class.java)
+                }
+                intent.putExtra("email", email)
+                intent.putExtra("password", password)
+                intent.putExtra("role", role)
+                startActivity(intent)
+            } else {
+                logIn(email, password)
+            }
         }
 
         btnLogIn.setOnClickListener {
@@ -91,7 +110,7 @@ class AuthActivity : AppCompatActivity() {
                     .set(userData)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
-                        goToDashboard()
+                        goToDashboard(role)
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
@@ -104,19 +123,30 @@ class AuthActivity : AppCompatActivity() {
 
     private fun logIn(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
-                goToDashboard()
+            .addOnSuccessListener { result ->
+                val uid = result.user?.uid ?: return@addOnSuccessListener
+                // fetch role from Firestore
+                db.collection("users").document(uid)
+                    .get()
+                    .addOnSuccessListener { doc ->
+                        val userRole = doc.getString("role") ?: "FAMILY"
+                        Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
+                        goToDashboard(userRole)
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Failed to fetch user data", Toast.LENGTH_SHORT).show()
+                    }
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Login failed: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun goToDashboard() {
+    private fun goToDashboard(userRole: String) {
         val intent = Intent(this, DashboardActivity::class.java)
-        intent.putExtra("role", role)
+        intent.putExtra("role", userRole)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
+
 }
