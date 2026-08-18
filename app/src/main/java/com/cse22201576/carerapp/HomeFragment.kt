@@ -137,6 +137,13 @@ class HomeFragment : Fragment() {
                 }
                 adapter.updateList(allCarers)
             }
+            .addOnFailureListener {
+                android.widget.Toast.makeText(
+                    requireContext(),
+                    "Failed to load carers: ${it.message}",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
     }
 
     private fun filterCarers(query: String, filter: String) {

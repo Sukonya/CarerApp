@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +30,6 @@
             android:textSize="14sp"
             android:layout_marginBottom="24dp"/>
 
-        <!-- Profile Photo -->
         <ImageView
             android:id="@+id/ivCarerPhoto"
             android:layout_width="100dp"
@@ -58,7 +59,6 @@
             android:backgroundTint="@color/primary_light"
             android:layout_marginBottom="24dp"/>
 
-        <!-- Full Name -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -80,7 +80,48 @@
             android:inputType="textPersonName"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Phone -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Email *"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/etCarerEmail"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Enter your email"
+            android:background="@drawable/input_bg"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_hint"
+            android:inputType="textEmailAddress"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Password *"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/etCarerPassword"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Create a password"
+            android:background="@drawable/input_bg"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_hint"
+            android:inputType="textPassword"
+            android:layout_marginBottom="16dp"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,7 +143,6 @@
             android:inputType="phone"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Carer Type -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -120,7 +160,6 @@
             android:paddingEnd="16dp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Hospital section — only shown for Specialized -->
         <LinearLayout
             android:id="@+id/layoutHospital"
             android:layout_width="match_parent"
@@ -160,7 +199,6 @@
 
         </LinearLayout>
 
-        <!-- Credentials -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -181,7 +219,6 @@
             android:textColorHint="@color/text_hint"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Experience -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -194,7 +231,7 @@
             android:id="@+id/etExperience"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="e.g. 5"
+            android:hint="e.g. 8"
             android:background="@drawable/input_bg"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
@@ -203,11 +240,10 @@
             android:inputType="number"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Hourly Rate -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hourly Rate (BDT)"
+            android:text="Hourly Rate (BDT) *"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:layout_marginBottom="4dp"/>
@@ -216,7 +252,7 @@
             android:id="@+id/etRate"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="e.g. 500"
+            android:hint="e.g. 400"
             android:background="@drawable/input_bg"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
@@ -225,7 +261,6 @@
             android:inputType="numberDecimal"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Bio -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -260,4 +295,5 @@
             android:textStyle="bold"/>
 
     </LinearLayout>
+
 </ScrollView>

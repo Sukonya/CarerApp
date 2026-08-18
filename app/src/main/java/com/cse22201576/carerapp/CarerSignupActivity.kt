@@ -17,8 +17,9 @@ class CarerSignupActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private lateinit var storage: FirebaseStorage
+
     private var selectedPhotoUri: Uri? = null
-    private var selectedCarerType = "Registered"
+    private var selectedCarerType = "registered"
 
     private val hospitals = listOf(
         "Square Hospital",
@@ -29,14 +30,17 @@ class CarerSignupActivity : AppCompatActivity() {
         "Other"
     )
 
-    // photo picker
     private val pickPhoto = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
             selectedPhotoUri = it
-            findViewById<ImageView>(R.id.ivCarerPhoto).setImageURI(it)
-            findViewById<TextView>(R.id.tvPhotoLabel).text = "Photo selected ✓"
+
+            findViewById<ImageView>(R.id.ivCarerPhoto)
+                .setImageURI(it)
+
+            findViewById<TextView>(R.id.tvPhotoLabel)
+                .text = "Photo selected ✓"
         }
     }
 
@@ -48,137 +52,324 @@ class CarerSignupActivity : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
         storage = FirebaseStorage.getInstance()
 
-        val email = intent.getStringExtra("email") ?: ""
-        val password = intent.getStringExtra("password") ?: ""
-        val role = intent.getStringExtra("role") ?: "CARER"
-
         supportActionBar?.title = "Carer Registration"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val etName = findViewById<EditText>(R.id.etCarerName)
+        val etEmail = findViewById<EditText>(R.id.etCarerEmail)
+        val etPassword = findViewById<EditText>(R.id.etCarerPassword)
         val etPhone = findViewById<EditText>(R.id.etCarerPhone)
+
         val etBio = findViewById<EditText>(R.id.etBio)
         val etCredentials = findViewById<EditText>(R.id.etCredentials)
         val etExperience = findViewById<EditText>(R.id.etExperience)
         val etRate = findViewById<EditText>(R.id.etRate)
-        val etHospitalOther = findViewById<EditText>(R.id.etHospitalOther)
-        val spinnerType = findViewById<Spinner>(R.id.spinnerCarerType)
-        val spinnerHospital = findViewById<Spinner>(R.id.spinnerHospital)
-        val layoutHospital = findViewById<LinearLayout>(R.id.layoutHospital)
-        val btnPhoto = findViewById<Button>(R.id.btnSelectPhoto)
-        val btnCreate = findViewById<Button>(R.id.btnCreateCarer)
 
-        // carer type spinner
-        val typeOptions = listOf("Registered Nurse", "Specialized Nurse")
-        spinnerType.adapter = ArrayAdapter(this,
-            android.R.layout.simple_spinner_dropdown_item, typeOptions)
+        val etHospitalOther =
+            findViewById<EditText>(R.id.etHospitalOther)
 
-        spinnerType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                selectedCarerType = if (pos == 0) "Registered" else "Specialized"
-                // show hospital section only for specialized nurses
-                layoutHospital.visibility = if (pos == 1) View.VISIBLE else View.GONE
+        val spinnerType =
+            findViewById<Spinner>(R.id.spinnerCarerType)
+
+        val spinnerHospital =
+            findViewById<Spinner>(R.id.spinnerHospital)
+
+        val layoutHospital =
+            findViewById<LinearLayout>(R.id.layoutHospital)
+
+        val btnPhoto =
+            findViewById<Button>(R.id.btnSelectPhoto)
+
+        val btnCreate =
+            findViewById<Button>(R.id.btnCreateCarer)
+
+
+        val typeOptions = listOf(
+            "Registered Nurse",
+            "Specialized Nurse"
+        )
+
+        spinnerType.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            typeOptions
+        )
+
+        spinnerType.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    selectedCarerType =
+                        if (position == 0) {
+                            "registered"
+                        } else {
+                            "specialized"
+                        }
+
+                    layoutHospital.visibility =
+                        if (position == 1) {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
+                        }
+                }
+
+                override fun onNothingSelected(
+                    parent: AdapterView<*>
+                ) {
+                }
             }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
 
-        // hospital spinner
-        spinnerHospital.adapter = ArrayAdapter(this,
-            android.R.layout.simple_spinner_dropdown_item, hospitals)
+        spinnerHospital.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            hospitals
+        )
 
-        spinnerHospital.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                // show text input if "Other" selected
-                etHospitalOther.visibility = if (hospitals[pos] == "Other") View.VISIBLE else View.GONE
+        spinnerHospital.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    etHospitalOther.visibility =
+                        if (hospitals[position] == "Other") {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
+                        }
+                }
+
+                override fun onNothingSelected(
+                    parent: AdapterView<*>
+                ) {
+                }
             }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
+
 
         btnPhoto.setOnClickListener {
             pickPhoto.launch("image/*")
         }
 
         btnCreate.setOnClickListener {
-            val name = etName.text.toString().trim()
-            val phone = etPhone.text.toString().trim()
-            val bio = etBio.text.toString().trim()
-            val credentials = etCredentials.text.toString().trim()
-            val experience = etExperience.text.toString().trim()
-            val rate = etRate.text.toString().trim()
 
-            if (name.isEmpty() || phone.isEmpty() || credentials.isEmpty()) {
-                Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show()
+            val name = etName.text.toString().trim()
+            val email = etEmail.text.toString().trim()
+            val password = etPassword.text.toString().trim()
+            val phone = etPhone.text.toString().trim()
+
+            val bio = etBio.text.toString().trim()
+            val credentials =
+                etCredentials.text.toString().trim()
+
+            val experience =
+                etExperience.text.toString().trim()
+
+            val rate =
+                etRate.text.toString().trim()
+
+            if (
+                name.isEmpty() ||
+                email.isEmpty() ||
+                password.isEmpty() ||
+                phone.isEmpty() ||
+                credentials.isEmpty() ||
+                experience.isEmpty() ||
+                rate.isEmpty()
+            ) {
+                Toast.makeText(
+                    this,
+                    "Please fill all required fields",
+                    Toast.LENGTH_SHORT
+                ).show()
+
                 return@setOnClickListener
             }
 
-            val hospitalName = if (selectedCarerType == "Specialized") {
-                val selected = spinnerHospital.selectedItem.toString()
-                if (selected == "Other") etHospitalOther.text.toString().trim()
-                else selected
-            } else ""
+            if (password.length < 6) {
+                Toast.makeText(
+                    this,
+                    "Password must be at least 6 characters",
+                    Toast.LENGTH_SHORT
+                ).show()
 
-            createCarerAccount(email, password, role, name, phone, bio,
-                credentials, experience, rate, hospitalName)
+                return@setOnClickListener
+            }
+
+            val hospitalName =
+                if (selectedCarerType == "specialized") {
+
+                    val selectedHospital =
+                        spinnerHospital.selectedItem.toString()
+
+                    if (selectedHospital == "Other") {
+                        etHospitalOther.text
+                            .toString()
+                            .trim()
+                    } else {
+                        selectedHospital
+                    }
+
+                } else {
+                    ""
+                }
+
+            createCarerAccount(
+                email = email,
+                password = password,
+                name = name,
+                phone = phone,
+                bio = bio,
+                credentials = credentials,
+                experience = experience,
+                rate = rate,
+                hospital = hospitalName
+            )
         }
     }
 
     private fun createCarerAccount(
-        email: String, password: String, role: String,
-        name: String, phone: String, bio: String,
-        credentials: String, experience: String,
-        rate: String, hospital: String
+        email: String,
+        password: String,
+        name: String,
+        phone: String,
+        bio: String,
+        credentials: String,
+        experience: String,
+        rate: String,
+        hospital: String
     ) {
-        auth.createUserWithEmailAndPassword(email, password)
+
+        auth.createUserWithEmailAndPassword(
+            email,
+            password
+        )
             .addOnSuccessListener { result ->
-                val uid = result.user?.uid ?: return@addOnSuccessListener
+
+                val uid = result.user?.uid
+                    ?: return@addOnSuccessListener
 
                 if (selectedPhotoUri != null) {
-                    // upload photo first then save data
-                    uploadPhotoAndSave(uid, email, role, name, phone, bio,
-                        credentials, experience, rate, hospital)
+
+                    uploadPhotoAndSave(
+                        uid = uid,
+                        email = email,
+                        name = name,
+                        phone = phone,
+                        bio = bio,
+                        credentials = credentials,
+                        experience = experience,
+                        rate = rate,
+                        hospital = hospital
+                    )
+
                 } else {
-                    saveCarerData(uid, email, role, name, phone, bio,
-                        credentials, experience, rate, hospital, "")
+
+                    saveCarerData(
+                        uid = uid,
+                        email = email,
+                        name = name,
+                        phone = phone,
+                        bio = bio,
+                        credentials = credentials,
+                        experience = experience,
+                        rate = rate,
+                        hospital = hospital,
+                        photoUrl = ""
+                    )
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Signup failed: ${it.message}", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Signup failed: ${it.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
     private fun uploadPhotoAndSave(
-        uid: String, email: String, role: String,
-        name: String, phone: String, bio: String,
-        credentials: String, experience: String,
-        rate: String, hospital: String
+        uid: String,
+        email: String,
+        name: String,
+        phone: String,
+        bio: String,
+        credentials: String,
+        experience: String,
+        rate: String,
+        hospital: String
     ) {
-        val ref = storage.reference.child("carer_photos/${UUID.randomUUID()}.jpg")
+
+        val ref = storage.reference
+            .child(
+                "carer_photos/${UUID.randomUUID()}.jpg"
+            )
+
         ref.putFile(selectedPhotoUri!!)
             .addOnSuccessListener {
-                ref.downloadUrl.addOnSuccessListener { uri ->
-                    saveCarerData(uid, email, role, name, phone, bio,
-                        credentials, experience, rate, hospital, uri.toString())
-                }
+
+                ref.downloadUrl
+                    .addOnSuccessListener { uri ->
+
+                        saveCarerData(
+                            uid = uid,
+                            email = email,
+                            name = name,
+                            phone = phone,
+                            bio = bio,
+                            credentials = credentials,
+                            experience = experience,
+                            rate = rate,
+                            hospital = hospital,
+                            photoUrl = uri.toString()
+                        )
+                    }
             }
             .addOnFailureListener {
-                // save without photo if upload fails
-                saveCarerData(uid, email, role, name, phone, bio,
-                    credentials, experience, rate, hospital, "")
+
+                saveCarerData(
+                    uid = uid,
+                    email = email,
+                    name = name,
+                    phone = phone,
+                    bio = bio,
+                    credentials = credentials,
+                    experience = experience,
+                    rate = rate,
+                    hospital = hospital,
+                    photoUrl = ""
+                )
             }
     }
 
     private fun saveCarerData(
-        uid: String, email: String, role: String,
-        name: String, phone: String, bio: String,
-        credentials: String, experience: String,
-        rate: String, hospital: String, photoUrl: String
+        uid: String,
+        email: String,
+        name: String,
+        phone: String,
+        bio: String,
+        credentials: String,
+        experience: String,
+        rate: String,
+        hospital: String,
+        photoUrl: String
     ) {
+
         val userData = hashMapOf(
             "uid" to uid,
             "full_name" to name,
             "email" to email,
             "phone" to phone,
-            "role" to role,
+            "role" to "CARER",
             "carer_type" to selectedCarerType,
             "hospital" to hospital,
             "bio" to bio,
@@ -191,26 +382,55 @@ class CarerSignupActivity : AppCompatActivity() {
             "created_at" to System.currentTimeMillis()
         )
 
-        db.collection("users").document(uid)
+        db.collection("users")
+            .document(uid)
             .set(userData)
             .addOnSuccessListener {
-                // also save to carer_profiles collection
-                db.collection("carer_profiles").document(uid)
+
+                // Also save in carer_profiles
+                db.collection("carer_profiles")
+                    .document(uid)
                     .set(userData)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
-                        goToDashboard(role)
+
+                        Toast.makeText(
+                            this,
+                            "Account created!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        goToDashboard()
+                    }
+                    .addOnFailureListener {
+
+                        Toast.makeText(
+                            this,
+                            "Failed to save carer profile",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Failed to save data", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Failed to save user data",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
-    private fun goToDashboard(role: String) {
-        val intent = Intent(this, DashboardActivity::class.java)
-        intent.putExtra("role", role)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    private fun goToDashboard() {
+
+        val intent =
+            Intent(this, DashboardActivity::class.java)
+
+        intent.putExtra("role", "CARER")
+
+        intent.flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+
         startActivity(intent)
     }
 
